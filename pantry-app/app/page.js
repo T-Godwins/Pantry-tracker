@@ -1,7 +1,7 @@
 "use client"
 import { Box, Stack, Typography, Button, Modal, TextField} from "@mui/material";
 import {firestore} from "/Users/tuyishimeg/Desktop/Projects/Pantry-Tracker/firebase.js"
-import {collection, getDocs, query} from "firebase/firestore"
+import {collection, getDocs, setDoc, query} from "firebase/firestore"
 import { useEffect, useState } from "react";
 import { update } from "firebase/database";
 
@@ -29,21 +29,27 @@ export default function Home() {
 
   const [itemName, setItemName] = useState('')
 
+  const updatePantry = async () => {
+    const snapshot = query(collection(firestore, 'pantry'))
+    const docs = await getDocs(snapshot)
+    const pantryList = []
+    docs.forEach((doc) => {
+      pantryList.push(doc.id)
+    })
+    console.log(pantryList)
+    setPantry(pantryList)
+  }
+
   useEffect(() => {
-    const updatePantry = async () => {
-      const snapshot = query(collection(firestore, 'pantry'))
-      const docs = await getDocs(snapshot)
-      const pantryList = []
-      docs.forEach((doc) => {
-        pantryList.push(doc.id)
-      })
-      console.log(pantryList)
-      setPantry(pantryList)
-    }
+   
     updatePantry()
   }, [])
 
-  const addItem = async () => {}
+  const addItem = async (item) => {
+    const docRef = doc(collection(firestore, 'pantry'), item)
+    await setDoc(docRef, {})
+    updatePantry()
+  }
   return (
     <Box
       width="100vw" 
