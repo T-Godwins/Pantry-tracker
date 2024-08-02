@@ -1,17 +1,21 @@
 "use client"
-import { Box, Stack, Typography, Button, Modal, TextField } from "@mui/material";
+import { Box, Stack, Typography, Button, TextField, Modal } from "@mui/material";
 import { firestore } from "/Users/tuyishimeg/Desktop/Projects/Pantry-Tracker/firebase.js";
 import { collection, getDocs, getDoc, setDoc, query, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import Head from 'next/head';
+import GoogleAnalytics from "./googleAnalytics";
 
 const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 400,
+  width: '100%',
+  maxWidth: 400,
   bgcolor: 'background.paper',
-  border: '2px solid #000',
+  // border: '2px solid #000',
+  borderRadius: "15px",
   boxShadow: 24,
   p: 4,
   display: 'flex',
@@ -21,11 +25,15 @@ const style = {
 
 export default function Home() {
   const [pantry, setPantry] = useState([]);
-  const [open, setOpen] = useState(false);
   const [itemName, setItemName] = useState('');
   const [filterText, setFilterText] = useState('');
+  const [open, setOpen] = useState(false);
+  const [itemToRemove, setItemToRemove] = useState('');
 
-  const handleOpen = () => setOpen(true);
+  const handleOpen = (item) => {
+    setItemToRemove(item);
+    setOpen(true);
+  };
   const handleClose = () => setOpen(false);
 
   const updatePantry = async () => {
@@ -82,8 +90,13 @@ export default function Home() {
   );
 
   return (
+    <>
+    <Head>
+      <GoogleAnalytics />
+    </Head>
     <Box
       width="100vw"
+      bgcolor="#D3D3D3"
       height="100vh"
       display="flex"
       justifyContent="center"
@@ -91,46 +104,27 @@ export default function Home() {
       alignItems="center"
       gap={2}
     >
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Add Item
+      <Box
+          width="800px" 
+          height="100px"
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          // paddingX={50}
+          paddingBottom={2}
+          
+        >
+          <Typography variant="h1" color="#333" textAlign="center">
+            Smart Pantry
           </Typography>
-          <Stack direction={'row'} spacing={2}>
-            <TextField 
-              id="outlined-basic" 
-              label="Item" 
-              variant="outlined" 
-              fullWidth
-              value={itemName}
-              onChange={(e) => setItemName(e.target.value)}
-            />
-            <Button 
-              variant="outlined"
-              onClick={() => {
-                addItem(itemName);
-                setItemName('');
-                handleClose();
-              }}
-            >
-              Add
-            </Button>
-          </Stack>
-        </Box>
-      </Modal>
-      <Stack 
+          
+          <Stack 
         direction="row"
         spacing={2}
-        width="800px"
+        width="200px"
         alignItems="center"
         padding={1}
       >
-        <Button variant="contained" onClick={handleOpen}>Add</Button>
         <TextField 
           id="filter-basic" 
           label="Filter Items" 
@@ -140,37 +134,61 @@ export default function Home() {
           onChange={(e) => setFilterText(e.target.value)}
         />
       </Stack>
-      <Box border={'1px solid'} width="800px">
-        <Box
-          width="100%" 
-          height="100px"
-          bgcolor="#ADD8E6"
+      </Box>
+      
+
+      <Box width="800px">
+        <Typography id="modal-modal-title" variant="h6" component="h2">
+          Add Item
+        </Typography>
+        <Stack 
+          direction={'row'} 
+          spacing={2} 
+          width="100%"
           display="flex"
+          justifyContent="space-between"
           alignItems="center"
-          justifyContent="center"
         >
-          <Typography variant="h1" color="#333" textAlign="center">
-            Pantry Items
-          </Typography>
-        </Box>
+          <TextField 
+            id="outlined-basic" 
+            label="Item" 
+            variant="outlined" 
+            fullWidth
+            value={itemName}
+            onChange={(e) => setItemName(e.target.value)}
+          />
+          <Button 
+            variant="outlined"
+            onClick={() => {
+              addItem(itemName);
+              setItemName('');
+            }}
+          >
+            Add
+          </Button>
+        </Stack>
+      </Box>
+      
+      <Box sx={{ borderTop: 5 }} width="800px">
         <Stack
           width="100%"
           height="300px"
           spacing={2}
           overflow="auto"
-          padding={2}
+          padding={1}
         >
           {filteredPantry.map(({ name, count }) => (
             <Box
               key={name}
+              sx={{ borderRadius: '16px' }}
               width="100%" 
               minHeight="150px"
               display="flex"
               justifyContent="space-between"
               alignItems="center"
-              bgcolor="#f0f0f0"
-              mb={2}
-              paddingX={5}
+              border={'1px solid'}
+              mb={1}
+              paddingX={2}
             >
               <Typography variant="h3" color="#333" textAlign="center">
                 {name.charAt(0).toUpperCase() + name.slice(1)}
@@ -185,7 +203,7 @@ export default function Home() {
                 <Button variant="contained" onClick={() => decrementItem(name)}>
                   -
                 </Button>
-                <Button variant="contained" onClick={() => removeAllItems(name)}>
+                <Button variant="contained" onClick={() => handleOpen(name)}>
                   Remove
                 </Button>
               </Box>          
@@ -193,6 +211,38 @@ export default function Home() {
           ))}
         </Stack>
       </Box>
+      
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Confirm Removal
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            Are you sure you want to remove {itemToRemove} from the pantry?
+          </Typography>
+          <Box display="flex" justifyContent="space-between" mt={2}>
+            <Button variant="outlined" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => {
+                removeAllItems(itemToRemove);
+                handleClose();
+              }}
+            >
+              Remove
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </Box>
+    </>
   );
 }
