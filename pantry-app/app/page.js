@@ -4,8 +4,9 @@ import { firestore } from "../firebase.js";
 import { collection, getDocs, getDoc, setDoc, query, doc, deleteDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import Head from 'next/head';
+import { GoogleAnalytics } from '@next/third-parties/google'
 // import GoogleAnalytics from ".GoogleAnalytics";
-import Recipe from "./gemini";
+import Recipe from "./ai.js";
 
 const style = {
   position: 'absolute',
@@ -94,9 +95,7 @@ export default function Home() {
 
   return (
     <>
-      {/* <Head>
-        <GoogleAnalytics />
-      </Head> */}
+     <GoogleAnalytics gaId="G-LMJNZW5WLW"  />
       <Box
         width="100vw"
         bgcolor="#D3D3D3"
