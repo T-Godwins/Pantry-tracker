@@ -4,7 +4,7 @@ import { firestore } from "../firebase.js";
 import { collection, getDocs, getDoc, setDoc, query, doc, deleteDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import Head from 'next/head';
-import { GoogleAnalytics } from '@next/third-parties/google'
+// import { GoogleAnalytics } from '@next/third-parties/google'
 // import GoogleAnalytics from ".GoogleAnalytics";
 import Recipe from "./ai.js";
 
@@ -95,7 +95,7 @@ export default function Home() {
 
   return (
     <>
-     <GoogleAnalytics gaId="G-LMJNZW5WLW"  />
+     {/* <GoogleAnalytics gaId="G-LMJNZW5WLW"  /> */}
       <Box
         width="100vw"
         bgcolor="#D3D3D3"
@@ -178,7 +178,7 @@ export default function Home() {
           </Typography>
         </Box> */}
 
-        <Box sx={{ borderTop: 5 }} width="800px">
+        <Box sx={{ borderTop: 0 }} width="800px">
           <Stack
             width="100%"
             height="300px"
