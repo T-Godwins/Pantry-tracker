@@ -1,10 +1,10 @@
 "use client"
-import { Box, Stack, Typography, Button, Modal, TextField} from "@mui/material";
-import {firestore} from "/Users/tuyishimeg/Desktop/Projects/Pantry-Tracker/firebase.js"
-import {collection, getDocs, query} from "firebase/firestore"
+import { Box, Stack, Typography, Button, TextField, Modal } from "@mui/material";
+import { firestore } from "/Users/tuyishimeg/Desktop/Projects/Pantry-Tracker/firebase.js";
+import { collection, getDocs, getDoc, setDoc, query, doc, deleteDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import Head from 'next/head';
-import GoogleAnalytics from "./GoogleAnalytics";
+// import GoogleAnalytics from ".GoogleAnalytics";
 import Recipe from "./gemini";
 
 const style = {
@@ -50,25 +50,53 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const updatePantry = async () => {
-      const snapshot = query(collection(firestore, 'pantry'))
-      const docs = await getDocs(snapshot)
-      const pantryList = []
-      docs.forEach((doc) => {
-        pantryList.push(doc.id)
-      })
-      console.log(pantryList)
-      setPantry(pantryList)
-    }
-    updatePantry()
-  }, [])
+    updatePantry();
+  }, []);
 
-  const addItem = async () => {}
+  const addItem = async (item) => {
+    const itemNameLowerCase = item.toLowerCase();
+    const docRef = doc(collection(firestore, 'pantry'), itemNameLowerCase);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const { count } = docSnap.data();
+      await setDoc(docRef, { count: count + 1 });
+    } else {
+      await setDoc(docRef, { count: 1 });
+    }
+    await updatePantry();
+  };
+
+  const decrementItem = async (item) => {
+    const docRef = doc(collection(firestore, 'pantry'), item);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const { count } = docSnap.data();
+      if (count > 1) {
+        await setDoc(docRef, { count: count - 1 });
+      } else {
+        await deleteDoc(docRef);
+      }
+    }
+    await updatePantry();
+  };
+
+  const removeAllItems = async (item) => {
+    const docRef = doc(collection(firestore, 'pantry'), item);
+    await deleteDoc(docRef);
+    await updatePantry();
+  };
+
+  const filteredPantry = pantry.filter(({ name }) => 
+    name.toLowerCase().includes(filterText.toLowerCase())
+  );
+
   return (
     <>
-      <Head>
+      {/* <Head>
         <GoogleAnalytics />
-      </Head>
+      </Head> */}
       <Box
         width="100vw"
         bgcolor="#D3D3D3"
@@ -139,7 +167,7 @@ export default function Home() {
             </Button>
           </Stack>
         </Box>
-
+{/* 
         <Box width="800px" mt={2}>
           <Typography id="recipe-modal-title" variant="h6" component="h2">
             Suggested Recipe
@@ -149,7 +177,7 @@ export default function Home() {
           <Typography variant="body1" color="#333" textAlign="left" width="100%">
             {recipe}
           </Typography>
-        </Box>
+        </Box> */}
 
         <Box sx={{ borderTop: 5 }} width="800px">
           <Stack
