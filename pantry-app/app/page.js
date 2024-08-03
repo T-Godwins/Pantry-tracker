@@ -1,7 +1,7 @@
 "use client"
-import { Box, Stack, Typography, Button, TextField, Modal } from "@mui/material";
-import { firestore } from "/Users/tuyishimeg/Desktop/Projects/Pantry-Tracker/firebase.js";
-import { collection, getDocs, getDoc, setDoc, query, doc, deleteDoc } from "firebase/firestore";
+import { Box, Stack, Typography, Button, Modal, TextField} from "@mui/material";
+import {firestore} from "/Users/tuyishimeg/Desktop/Projects/Pantry-Tracker/firebase.js"
+import {collection, getDocs, query} from "firebase/firestore"
 import { useEffect, useState } from "react";
 import Head from 'next/head';
 import GoogleAnalytics from "./GoogleAnalytics";
@@ -50,48 +50,20 @@ export default function Home() {
   };
 
   useEffect(() => {
-    updatePantry();
-  }, []);
-
-  const addItem = async (item) => {
-    const itemNameLowerCase = item.toLowerCase();
-    const docRef = doc(collection(firestore, 'pantry'), itemNameLowerCase);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      const { count } = docSnap.data();
-      await setDoc(docRef, { count: count + 1 });
-    } else {
-      await setDoc(docRef, { count: 1 });
+    const updatePantry = async () => {
+      const snapshot = query(collection(firestore, 'pantry'))
+      const docs = await getDocs(snapshot)
+      const pantryList = []
+      docs.forEach((doc) => {
+        pantryList.push(doc.id)
+      })
+      console.log(pantryList)
+      setPantry(pantryList)
     }
-    await updatePantry();
-  };
+    updatePantry()
+  }, [])
 
-  const decrementItem = async (item) => {
-    const docRef = doc(collection(firestore, 'pantry'), item);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      const { count } = docSnap.data();
-      if (count > 1) {
-        await setDoc(docRef, { count: count - 1 });
-      } else {
-        await deleteDoc(docRef);
-      }
-    }
-    await updatePantry();
-  };
-
-  const removeAllItems = async (item) => {
-    const docRef = doc(collection(firestore, 'pantry'), item);
-    await deleteDoc(docRef);
-    await updatePantry();
-  };
-
-  const filteredPantry = pantry.filter(({ name }) => 
-    name.toLowerCase().includes(filterText.toLowerCase())
-  );
-
+  const addItem = async () => {}
   return (
     <>
       <Head>
