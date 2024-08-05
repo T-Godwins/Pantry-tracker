@@ -7,6 +7,7 @@ import Head from 'next/head';
 // import { GoogleAnalytics } from '@next/third-parties/google'
 // import GoogleAnalytics from ".GoogleAnalytics";
 import Recipe from "./ai.js";
+import Navbar from "./navbar.js";
 
 const style = {
   position: 'absolute',
@@ -96,6 +97,7 @@ export default function Home() {
   return (
     <>
      {/* <GoogleAnalytics gaId="G-LMJNZW5WLW"  /> */}
+     <Navbar/>
       <Box
         width="100vw"
         bgcolor="#D3D3D3"
