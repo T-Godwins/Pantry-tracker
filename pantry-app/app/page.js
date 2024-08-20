@@ -1,6 +1,6 @@
 "use client"
 import { Box, Stack, Typography, Button, Modal, TextField} from "@mui/material";
-import {firestore} from "/Users/tuyishimeg/Desktop/Projects/Pantry-Tracker/firebase.js"
+import {firestore} from "firebase.js"
 import {collection, getDocs, setDoc, query} from "firebase/firestore"
 import { useEffect, useState } from "react";
 import { update } from "firebase/database";
